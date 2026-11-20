@@ -1,8 +1,12 @@
 node_modules/
 dist/
+*.tsbuildinfo
 dist-ssr/
 coverage/
 *.local
 *.log
 .DS_Store
 .idea/
+.env
+.env.local
+.env.*.local
