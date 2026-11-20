@@ -18,3 +18,48 @@ model User {
 
   @@map("users")
 }
+
+model CarType {
+  id   String @id @default(uuid())
+  name String @unique
+
+  @@map("car_types")
+}
+
+model Brand {
+  id   String @id @default(uuid())
+  name String @unique
+
+  @@map("brands")
+}
+
+model CarModel {
+  id      String @id @default(uuid())
+  name    String
+  brandId String @map("brand_id")
+
+  @@unique([brandId, name])
+  @@map("car_models")
+}
+
+enum CarStatus {
+  available
+  rented
+  maintenance
+}
+
+model Car {
+  id           String    @id @default(uuid())
+  licensePlate String    @unique @map("license_plate")
+  color        String
+  pricePerDay  Int       @map("price_per_day")
+  status       CarStatus @default(available)
+  rentalDate   DateTime? @map("rental_date")
+  dueDate      DateTime? @map("due_date")
+  typeId       String    @map("type_id")
+  carModelId   String    @map("car_model_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("cars")
+}
