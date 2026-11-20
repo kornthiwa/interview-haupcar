@@ -4,7 +4,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { PasswordHasher, TokenService } from '@nestjs/authentication';
+import { scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -28,13 +29,7 @@ export type UserRecord = {
   updatedAt: Date;
 };
 
-async function hashPassword(password: string) {
-  const salt = randomBytes(16).toString('hex');
-  const hash = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${salt}:${hash.toString('hex')}`;
-}
-
-async function verifyPassword(password: string, stored: string) {
+async function verifyLegacyPassword(password: string, stored: string) {
   const [salt, storedHash] = stored.split(':');
   if (!salt || !storedHash) return false;
 
@@ -61,7 +56,11 @@ function isMissing(error: unknown) {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly passwords: PasswordHasher,
+    private readonly tokens: TokenService,
+  ) {}
 
   findAll() {
     return this.prisma.user.findMany({
@@ -79,23 +78,37 @@ export class UsersService {
     return user;
   }
 
-  async login(dto: LoginDto): Promise<UserRecord> {
+  async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { username: dto.username },
     });
-    const matches = user
-      ? await verifyPassword(dto.password, user.password)
-      : false;
-    if (!user || !matches) {
+    const current = await this.passwords.verify(dto.password, user?.password);
+    const legacy =
+      !current && user
+        ? await verifyLegacyPassword(dto.password, user.password)
+        : false;
+    if (!user || (!current && !legacy)) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
+    if (legacy) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: await this.passwords.hash(dto.password) },
+      });
+    }
+
+    const tokens = await this.tokens.issue(user.id, {
+      claims: { name: user.name },
+    });
     return {
       id: user.id,
       name: user.name,
       username: user.username,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      accessToken: tokens.accessToken,
+      expiresIn: tokens.expiresIn,
     };
   }
 
@@ -105,7 +118,7 @@ export class UsersService {
         data: {
           name: dto.name,
           username: dto.username,
-          password: await hashPassword(dto.password),
+          password: await this.passwords.hash(dto.password),
         },
         select: userSelect,
       });
@@ -124,7 +137,9 @@ export class UsersService {
         data: {
           name: dto.name,
           username: dto.username,
-          password: dto.password ? await hashPassword(dto.password) : undefined,
+          password: dto.password
+            ? await this.passwords.hash(dto.password)
+            : undefined,
         },
         select: userSelect,
       });

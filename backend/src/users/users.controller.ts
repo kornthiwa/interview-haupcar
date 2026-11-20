@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { Public } from '@nestjs/authentication';
 import { CreateUserDto, LoginDto, UpdateUserDto } from './dto/user.dto.js';
 import { UsersService } from './users.service.js';
 
@@ -26,11 +27,13 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Public()
   @Post('register')
   register(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
 
+  @Public()
   @Post('login')
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
