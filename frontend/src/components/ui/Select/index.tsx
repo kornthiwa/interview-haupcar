@@ -1,22 +1,23 @@
-import type { SelectHTMLAttributes } from 'react'
+import MenuItem from '@mui/material/MenuItem'
+import TextField, { type TextFieldProps } from '@mui/material/TextField'
 
 type SelectOption = {
   value: string
   label: string
 }
 
-type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children'> & {
+type SelectProps = Omit<TextFieldProps, 'select' | 'children'> & {
   options: SelectOption[]
 }
 
 export function Select({ options, ...props }: SelectProps) {
   return (
-    <select {...props}>
+    <TextField fullWidth select size="small" {...props}>
       {options.map((option) => (
-        <option key={option.value} value={option.value}>
+        <MenuItem key={option.value} value={option.value}>
           {option.label}
-        </option>
+        </MenuItem>
       ))}
-    </select>
+    </TextField>
   )
 }

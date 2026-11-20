@@ -2,8 +2,8 @@
 
 แอปแยกเป็น 2 โฟลเดอร์ ต้องเปิดคนละเทอร์มินัล
 
-- `frontend` — React (Vite) ที่ http://localhost:5173
-- `backend` — NestJS ที่ http://localhost:3000
+- `frontend` — React, MUI, TanStack Query, Zustand, React Hook Form, Zod
+- `backend` — NestJS ที่ http://localhost:3000/api
 
 ต้องมี [Node.js LTS](https://nodejs.org/) ติดตั้งไว้ก่อน
 
@@ -26,8 +26,6 @@ cd backend
 npm run start:dev
 ```
 
-เปิด http://localhost:3000 แล้วจะได้ข้อความ `Hello World!`
-
 เทอร์มินัลที่ 2 รัน frontend:
 
 ```powershell
@@ -35,9 +33,9 @@ cd frontend
 npm run dev
 ```
 
-เปิด http://localhost:5173 จะอยู่หน้า Home
+เปิด http://localhost:5173
 
-หน้าที่มีให้เปิด:
+- http://localhost:5173/ หน้า Home
+- http://localhost:5173/user ฟอร์มผู้ใช้ บันทึกไปที่ `PUT /api/users`
 
-- http://localhost:5173/
-- http://localhost:5173/user
+ตัวแปร `VITE_API_URL` มีค่าเริ่มต้นเป็น `http://localhost:3000/api`

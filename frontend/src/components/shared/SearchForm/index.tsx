@@ -1,6 +1,9 @@
+import SearchIcon from '@mui/icons-material/Search'
+import InputAdornment from '@mui/material/InputAdornment'
 import type { FormEvent } from 'react'
 import { Button } from '@/components/ui/Button/index.tsx'
 import { Input } from '@/components/ui/Input/index.tsx'
+import { Stack } from '@/components/ui/Stack/index.tsx'
 
 type SearchFormProps = {
   onSearch: (query: string) => void
@@ -18,14 +21,27 @@ export function SearchForm({
   }
 
   return (
-    <form className="search-form" onSubmit={handleSubmit}>
-      <Input
-        name="q"
-        type="search"
-        placeholder={placeholder}
-        aria-label={placeholder}
-      />
-      <Button type="submit">Search</Button>
+    <form onSubmit={handleSubmit}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <Input
+          name="q"
+          type="search"
+          placeholder={placeholder}
+          aria-label={placeholder}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+        <Button type="submit" variant="contained">
+          Search
+        </Button>
+      </Stack>
     </form>
   )
 }

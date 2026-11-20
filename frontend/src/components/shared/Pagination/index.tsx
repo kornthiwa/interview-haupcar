@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/Button/index.tsx'
+import MuiPagination from '@mui/material/Pagination'
 
 type PaginationProps = {
   page: number
@@ -7,19 +7,13 @@ type PaginationProps = {
 }
 
 export function Pagination({ page, pageCount, onPageChange }: PaginationProps) {
-  const total = Math.max(pageCount, 1)
-
   return (
-    <nav className="pagination" aria-label="Pagination">
-      <Button disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-        Previous
-      </Button>
-      <span>
-        {page} / {total}
-      </span>
-      <Button disabled={page >= total} onClick={() => onPageChange(page + 1)}>
-        Next
-      </Button>
-    </nav>
+    <MuiPagination
+      page={page}
+      count={Math.max(pageCount, 1)}
+      color="primary"
+      shape="rounded"
+      onChange={(_, nextPage) => onPageChange(nextPage)}
+    />
   )
 }

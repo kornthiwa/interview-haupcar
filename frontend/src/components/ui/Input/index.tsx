@@ -1,7 +1,5 @@
-import type { InputHTMLAttributes } from 'react'
+import TextField, { type TextFieldProps } from '@mui/material/TextField'
 
-type InputProps = InputHTMLAttributes<HTMLInputElement>
-
-export function Input(props: InputProps) {
-  return <input {...props} />
+export function Input(props: TextFieldProps) {
+  return <TextField fullWidth size="small" {...props} />
 }

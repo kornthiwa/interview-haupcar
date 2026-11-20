@@ -1,7 +1,11 @@
+import { Typography } from '@/components/ui/Typography/index.tsx'
+
 export function HomePage() {
   return (
     <section>
-      <h1>Home</h1>
+      <Typography variant="h4" component="h1">
+        Home
+      </Typography>
     </section>
   )
 }
