@@ -2,23 +2,27 @@
 
 ระบบเช่ารถ: React frontend + NestJS API + PostgreSQL
 
-## Deploy frontend บน Vercel
+## Vercel (2 โปรเจกต์)
 
-Vercel โฮสต์ **frontend อย่างเดียว** — Nest API ต้องมี URL สาธารณะแยก (Docker / Railway / Render)
+| โปรเจกต์ | Root Directory | Domain |
+| --- | --- | --- |
+| API `interview-haupcar` | `backend` | https://interview-haupcar.vercel.app |
+| Web `interview-haupcar-93hn` | `frontend` | https://interview-haupcar-93hn.vercel.app |
 
-ใน Vercel → Project Settings:
+### API project env (Secret/Config ตามความเหมาะสม)
 
-| Setting | ค่า |
-| --- | --- |
-| Root Directory | ว่าง (ใช้ `vercel.json` ที่ root) **หรือ** `frontend` |
-| Framework Preset | Other / Vite |
-| Environment | `API_URL` = `https://<backend-host>/api` ชนิด **Config** (ห้ามเป็น Secret) |
+- `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`
+- `CORS_ORIGINS=https://interview-haupcar-93hn.vercel.app` (หรือปล่อยให้โค้ดรับ `*.vercel.app`)
 
-ตัวอย่าง: ถ้า API อยู่ที่ `https://haupcar-api.onrender.com` ให้ตั้ง `API_URL=https://haupcar-api.onrender.com/api` แล้ว Redeploy
+### Web project env (**Config**)
 
-ถ้าไม่ตั้ง `API_URL` แอปจะเรียก `/api` บนโดเมน Vercel → ไม่มี Nest → login/CRUD พัง
+```
+API_URL=https://interview-haupcar.vercel.app/api
+```
 
-ตรวจงานครบระบบแนะนำ `docker compose up --build` แทน Vercel
+แล้ว Redeploy ทั้งสองโปรเจกต์
+
+Login demo หลัง seed: `admin` / `admin123`
 
 ---
 
@@ -44,13 +48,9 @@ docker compose up --build
 docker compose down -v
 ```
 
-Compose จะรัน Postgres, migrate, seed (รถ 100 คัน + user demo) แล้วเปิด frontend ผ่าน nginx ที่ proxy `/api` ไป backend
-
 ---
 
 ## รันแบบ local (ไม่มี Docker)
-
-แอปแยกเป็น 2 โฟลเดอร์ ต้องเปิดคนละเทอร์มินัล
 
 - `frontend` — React, MUI, TanStack Query, Zustand, React Hook Form, Zod
 - `backend` — NestJS ที่ http://localhost:3000/api
