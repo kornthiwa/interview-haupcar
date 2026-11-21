@@ -80,4 +80,4 @@ npm run dev
 
 เปิด http://localhost:5173
 
-ตัวแปร `VITE_API_URL` มีค่าเริ่มต้นเป็น `http://localhost:3000/api`
+Frontend ใช้ `API_URL` ตอน build (ค่าเริ่มต้น `/api`) และ Vite proxy `/api` ไป backend ตอน `npm run dev`

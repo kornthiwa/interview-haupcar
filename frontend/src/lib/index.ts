@@ -1,2 +1,2 @@
-export { env } from './env.ts'
+export { config } from './config.ts'
 export { http } from './http.ts'

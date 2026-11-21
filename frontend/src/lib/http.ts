@@ -1,9 +1,9 @@
 import axios from 'axios'
 import { clearSession, getAccessToken } from '@/store/index.ts'
-import { env } from './env.ts'
+import { config } from './config.ts'
 
 export const http = axios.create({
-  baseURL: env.apiUrl,
+  baseURL: config.apiUrl,
   headers: { 'Content-Type': 'application/json' },
 })
 
