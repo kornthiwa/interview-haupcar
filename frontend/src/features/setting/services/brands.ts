@@ -1,8 +1,9 @@
 import { http } from '@/lib/http.ts'
+import type { ListQuery, Paginated } from '@/types/pagination.ts'
 import type { Brand } from '../types/index.ts'
 
-export async function getBrands() {
-  const { data } = await http.get<Brand[]>('/brands')
+export async function getBrands(query: ListQuery = {}) {
+  const { data } = await http.get<Paginated<Brand>>('/brands', { params: query })
   return data
 }
 

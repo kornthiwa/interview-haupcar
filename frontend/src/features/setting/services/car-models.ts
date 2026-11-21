@@ -1,8 +1,11 @@
 import { http } from '@/lib/http.ts'
+import type { ListQuery, Paginated } from '@/types/pagination.ts'
 import type { CarModel } from '../types/index.ts'
 
-export async function getCarModels() {
-  const { data } = await http.get<CarModel[]>('/car-models')
+export async function getCarModels(query: ListQuery = {}) {
+  const { data } = await http.get<Paginated<CarModel>>('/car-models', {
+    params: query,
+  })
   return data
 }
 

@@ -8,9 +8,11 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CarTypesService } from './car-types.service.js';
 import { CreateCarTypeDto } from './dto/create-car-type.dto.js';
+import { ListCarTypesDto } from './dto/list-car-types.dto.js';
 import { UpdateCarTypeDto } from './dto/update-car-type.dto.js';
 
 @Controller('car-types')
@@ -23,8 +25,8 @@ export class CarTypesController {
   }
 
   @Get()
-  findAll() {
-    return this.carTypesService.findAll();
+  findAll(@Query() query: ListCarTypesDto) {
+    return this.carTypesService.findAll(query);
   }
 
   @Get(':id')

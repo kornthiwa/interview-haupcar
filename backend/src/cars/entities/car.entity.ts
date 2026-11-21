@@ -8,6 +8,7 @@ export class Car {
   status: CarStatus;
   rentalDate: Date | null;
   dueDate: Date | null;
+  notes: string | null;
   typeId: string;
   carModelId: string;
   createdAt: Date;

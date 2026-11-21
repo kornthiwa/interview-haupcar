@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DataTable, type Column } from '@/components/shared/DataTable/index.tsx'
 import { Pagination } from '@/components/shared/Pagination/index.tsx'
+import { SearchForm } from '@/components/shared/SearchForm/index.tsx'
 import { Button } from '@/components/ui/Button/index.tsx'
 import { Stack } from '@/components/ui/Stack/index.tsx'
 import { Typography } from '@/components/ui/Typography/index.tsx'
@@ -20,12 +21,17 @@ type CarTypesTableProps = {
 
 export function CarTypesTable({ createRequest = 0 }: CarTypesTableProps) {
   const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
   const [mode, setMode] = useState<SettingDialogMode | null>(null)
   const [selected, setSelected] = useState<CarType | null>(null)
   const [name, setName] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
 
-  const { carTypes, isLoading, isError } = useCarTypes()
+  const { carTypes, meta, isLoading, isError } = useCarTypes({
+    page,
+    pageSize: PAGE_SIZE,
+    q: search,
+  })
   const {
     createCarTypeMutation,
     updateCarTypeMutation,
@@ -36,12 +42,6 @@ export function CarTypesTable({ createRequest = 0 }: CarTypesTableProps) {
     createCarTypeMutation.isPending ||
     updateCarTypeMutation.isPending ||
     deleteCarTypeMutation.isPending
-
-  const pageCount = Math.max(1, Math.ceil(carTypes.length / PAGE_SIZE))
-  const rows = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE
-    return carTypes.slice(start, start + PAGE_SIZE)
-  }, [carTypes, page])
 
   function openCreate() {
     setSelected(null)
@@ -148,6 +148,15 @@ export function CarTypesTable({ createRequest = 0 }: CarTypesTableProps) {
 
   return (
     <Stack spacing={2}>
+      <SearchForm
+        placeholder="Search car types"
+        defaultValue={search}
+        onSearch={(query) => {
+          setSearch(query)
+          setPage(1)
+        }}
+      />
+
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">
           Loading…
@@ -158,8 +167,16 @@ export function CarTypesTable({ createRequest = 0 }: CarTypesTableProps) {
         </Typography>
       ) : (
         <>
-          <DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />
-          <Pagination page={page} pageCount={pageCount} onPageChange={setPage} />
+          <DataTable
+            columns={columns}
+            rows={carTypes}
+            getRowId={(row) => row.id}
+          />
+          <Pagination
+            page={page}
+            pageCount={meta?.pageCount ?? 1}
+            onPageChange={setPage}
+          />
         </>
       )}
 

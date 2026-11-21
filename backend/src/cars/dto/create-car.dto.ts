@@ -35,6 +35,10 @@ export class CreateCarDto {
   @IsDateString()
   dueDate?: string;
 
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
   @IsUUID()
   typeId: string;
 

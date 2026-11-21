@@ -4,8 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import type { Paginated } from '../common/dto/pagination-query.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateCarModelDto } from './dto/create-car-model.dto.js';
+import { ListCarModelsDto } from './dto/list-car-models.dto.js';
 import { UpdateCarModelDto } from './dto/update-car-model.dto.js';
 import type { CarModel } from './entities/car-model.entity.js';
 
@@ -32,10 +34,23 @@ export class CarModelsService {
     }
   }
 
-  findAll(): Promise<CarModel[]> {
-    return this.prisma.carModel.findMany({
-      orderBy: [{ brandId: 'asc' }, { name: 'asc' }],
-    });
+  async findAll(query: ListCarModelsDto): Promise<Paginated<CarModel>> {
+    const term = query.searchTerm;
+    const where = term
+      ? { name: { contains: term, mode: 'insensitive' as const } }
+      : undefined;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.carModel.findMany({
+        where,
+        orderBy: [{ brandId: 'asc' }, { name: 'asc' }],
+        skip: query.skip,
+        take: query.take,
+      }),
+      this.prisma.carModel.count({ where }),
+    ]);
+
+    return query.toResult(data, total);
   }
 
   async findOne(id: string): Promise<CarModel> {

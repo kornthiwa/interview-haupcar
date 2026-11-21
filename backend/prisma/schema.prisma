@@ -56,6 +56,7 @@ model Car {
   status       CarStatus @default(available)
   rentalDate   DateTime? @map("rental_date")
   dueDate      DateTime? @map("due_date")
+  notes        String?
   typeId       String    @map("type_id")
   carModelId   String    @map("car_model_id")
   createdAt    DateTime  @default(now()) @map("created_at")

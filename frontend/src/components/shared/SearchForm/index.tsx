@@ -8,16 +8,18 @@ import { Stack } from '@/components/ui/Stack/index.tsx'
 type SearchFormProps = {
   onSearch: (query: string) => void
   placeholder?: string
+  defaultValue?: string
 }
 
 export function SearchForm({
   onSearch,
   placeholder = 'Search',
+  defaultValue = '',
 }: SearchFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    onSearch(String(data.get('q') ?? ''))
+    onSearch(String(data.get('q') ?? '').trim())
   }
 
   return (
@@ -27,6 +29,7 @@ export function SearchForm({
           name="q"
           type="search"
           placeholder={placeholder}
+          defaultValue={defaultValue}
           aria-label={placeholder}
           slotProps={{
             input: {

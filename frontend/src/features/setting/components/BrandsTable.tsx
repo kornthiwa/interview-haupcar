@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DataTable, type Column } from '@/components/shared/DataTable/index.tsx'
 import { Pagination } from '@/components/shared/Pagination/index.tsx'
+import { SearchForm } from '@/components/shared/SearchForm/index.tsx'
 import { Button } from '@/components/ui/Button/index.tsx'
 import { Stack } from '@/components/ui/Stack/index.tsx'
 import { Typography } from '@/components/ui/Typography/index.tsx'
@@ -20,12 +21,17 @@ type BrandsTableProps = {
 
 export function BrandsTable({ createRequest = 0 }: BrandsTableProps) {
   const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
   const [mode, setMode] = useState<SettingDialogMode | null>(null)
   const [selected, setSelected] = useState<Brand | null>(null)
   const [name, setName] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
 
-  const { brands, isLoading, isError } = useBrands()
+  const { brands, meta, isLoading, isError } = useBrands({
+    page,
+    pageSize: PAGE_SIZE,
+    q: search,
+  })
   const {
     createBrandMutation,
     updateBrandMutation,
@@ -36,12 +42,6 @@ export function BrandsTable({ createRequest = 0 }: BrandsTableProps) {
     createBrandMutation.isPending ||
     updateBrandMutation.isPending ||
     deleteBrandMutation.isPending
-
-  const pageCount = Math.max(1, Math.ceil(brands.length / PAGE_SIZE))
-  const rows = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE
-    return brands.slice(start, start + PAGE_SIZE)
-  }, [brands, page])
 
   function openCreate() {
     setSelected(null)
@@ -148,6 +148,15 @@ export function BrandsTable({ createRequest = 0 }: BrandsTableProps) {
 
   return (
     <Stack spacing={2}>
+      <SearchForm
+        placeholder="Search brands"
+        defaultValue={search}
+        onSearch={(query) => {
+          setSearch(query)
+          setPage(1)
+        }}
+      />
+
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">
           Loading…
@@ -158,8 +167,16 @@ export function BrandsTable({ createRequest = 0 }: BrandsTableProps) {
         </Typography>
       ) : (
         <>
-          <DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />
-          <Pagination page={page} pageCount={pageCount} onPageChange={setPage} />
+          <DataTable
+            columns={columns}
+            rows={brands}
+            getRowId={(row) => row.id}
+          />
+          <Pagination
+            page={page}
+            pageCount={meta?.pageCount ?? 1}
+            onPageChange={setPage}
+          />
         </>
       )}
 

@@ -12,12 +12,32 @@ export type Column<T> = {
   key: string
   header: string
   render?: (row: T, index: number) => ReactNode
+  width?: string | number
+  align?: 'left' | 'center' | 'right'
+  /** Shrink column to content width (good for id / actions). */
+  fit?: boolean
 }
 
 type DataTableProps<T extends object> = {
   columns: Column<T>[]
   rows: T[]
   getRowId: (row: T) => string
+}
+
+type ColumnLayout = Pick<Column<unknown>, 'key' | 'width' | 'fit'>
+
+function isFitColumn(column: ColumnLayout) {
+  if (column.fit != null) return column.fit
+  return column.key === 'id' || column.key === 'actions'
+}
+
+function cellSx(column: ColumnLayout) {
+  const fit = isFitColumn(column)
+  return {
+    width: column.width ?? (fit ? '1%' : 'auto'),
+    whiteSpace: fit ? ('nowrap' as const) : undefined,
+    verticalAlign: 'middle' as const,
+  }
 }
 
 export function DataTable<T extends object>({
@@ -27,11 +47,21 @@ export function DataTable<T extends object>({
 }: DataTableProps<T>) {
   return (
     <TableContainer component={Paper} variant="outlined">
-      <Table>
+      <Table sx={{ tableLayout: 'auto', width: '100%' }}>
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell key={column.key}>{column.header}</TableCell>
+              <TableCell
+                key={column.key}
+                align={column.align}
+                sx={{
+                  ...cellSx(column),
+                  fontWeight: 700,
+                  bgcolor: 'action.hover',
+                }}
+              >
+                {column.header}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -48,7 +78,11 @@ export function DataTable<T extends object>({
             rows.map((row, index) => (
               <TableRow key={getRowId(row)} hover>
                 {columns.map((column) => (
-                  <TableCell key={column.key}>
+                  <TableCell
+                    key={column.key}
+                    align={column.align}
+                    sx={cellSx(column)}
+                  >
                     {column.render
                       ? column.render(row, index)
                       : String(row[column.key as keyof T] ?? '')}

@@ -1,4 +1,5 @@
 import { http } from '@/lib/http.ts'
+import type { ListQuery, Paginated } from '@/types/pagination.ts'
 import type { Car } from '../types/index.ts'
 
 export type CreateCarInput = {
@@ -8,14 +9,15 @@ export type CreateCarInput = {
   status?: Car['status']
   rentalDate?: string
   dueDate?: string
+  notes?: string
   typeId: string
   carModelId: string
 }
 
 export type UpdateCarInput = Partial<CreateCarInput>
 
-export async function getCars() {
-  const { data } = await http.get<Car[]>('/cars')
+export async function getCars(query: ListQuery = {}) {
+  const { data } = await http.get<Paginated<Car>>('/cars', { params: query })
   return data
 }
 

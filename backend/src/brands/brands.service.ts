@@ -4,8 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import type { Paginated } from '../common/dto/pagination-query.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateBrandDto } from './dto/create-brand.dto.js';
+import { ListBrandsDto } from './dto/list-brands.dto.js';
 import { UpdateBrandDto } from './dto/update-brand.dto.js';
 import type { Brand } from './entities/brand.entity.js';
 
@@ -29,8 +31,23 @@ export class BrandsService {
     }
   }
 
-  findAll(): Promise<Brand[]> {
-    return this.prisma.brand.findMany({ orderBy: { name: 'asc' } });
+  async findAll(query: ListBrandsDto): Promise<Paginated<Brand>> {
+    const term = query.searchTerm;
+    const where = term
+      ? { name: { contains: term, mode: 'insensitive' as const } }
+      : undefined;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.brand.findMany({
+        where,
+        orderBy: { name: 'asc' },
+        skip: query.skip,
+        take: query.take,
+      }),
+      this.prisma.brand.count({ where }),
+    ]);
+
+    return query.toResult(data, total);
   }
 
   async findOne(id: string): Promise<Brand> {

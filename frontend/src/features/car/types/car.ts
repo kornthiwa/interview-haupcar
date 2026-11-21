@@ -8,6 +8,7 @@ export type Car = {
   status: CarStatus
   rentalDate: string | null
   dueDate: string | null
+  notes: string | null
   typeId: string
   carModelId: string
   createdAt: string

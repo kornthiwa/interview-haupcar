@@ -1,8 +1,11 @@
 import { http } from '@/lib/http.ts'
+import type { ListQuery, Paginated } from '@/types/pagination.ts'
 import type { CarType } from '../types/index.ts'
 
-export async function getCarTypes() {
-  const { data } = await http.get<CarType[]>('/car-types')
+export async function getCarTypes(query: ListQuery = {}) {
+  const { data } = await http.get<Paginated<CarType>>('/car-types', {
+    params: query,
+  })
   return data
 }
 
@@ -16,7 +19,10 @@ export async function createCarType(body: Pick<CarType, 'name'>) {
   return data
 }
 
-export async function updateCarType(id: string, body: Partial<Pick<CarType, 'name'>>) {
+export async function updateCarType(
+  id: string,
+  body: Partial<Pick<CarType, 'name'>>,
+) {
   const { data } = await http.patch<CarType>(`/car-types/${id}`, body)
   return data
 }
