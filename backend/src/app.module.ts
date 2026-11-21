@@ -12,17 +12,22 @@ import { CarTypesModule } from './car-types/car-types.module.js';
 import { CarModelsModule } from './car-models/car-models.module.js';
 import { CarsModule } from './cars/cars.module.js';
 
+const isVercel = Boolean(process.env.VERCEL);
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
-    ObserveModule.forRoot({
-      appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
-      appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
-      serviceId: 'backend',
-    }),
+    ...(isVercel
+      ? []
+      : [
+          ObserveModule.forRoot({
+            appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
+            appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
+            serviceId: 'backend',
+          }),
+        ]),
     PrismaModule,
     UsersModule,
     SupabaseModule,

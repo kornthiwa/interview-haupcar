@@ -1,16 +1,9 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import express, {
-  type Express,
-  type NextFunction,
-  type Request,
-  type Response,
-} from 'express';
 import { AppModule, ObserveInstrument } from './app.module.js';
 
-function configureApp(app: INestApplication) {
+export function configureApp(app: INestApplication) {
   const config = app.get(ConfigService);
 
   app.setGlobalPrefix('api');
@@ -50,45 +43,20 @@ function configureApp(app: INestApplication) {
   );
 }
 
-/** Express app for Vercel + Nest listen for local/Docker. */
+/** Nest listen for local / Docker / official Vercel Nest runtime. */
 export function createAppFactory(): {
   appPromise: Promise<INestApplication>;
-  expressApp: Express;
 } {
-  const expressApp = express();
-  const adapter = new ExpressAdapter(expressApp);
-  // Observe instrumentation is unreliable in Vercel serverless cold starts
-  const appPromise = process.env.VERCEL
-    ? NestFactory.create(AppModule, adapter)
-    : NestFactory.create(AppModule, adapter, {
-        instrument: ObserveInstrument,
-      });
-
-  appPromise
-    .then(async (app) => {
-      configureApp(app);
-      await app.init();
-    })
-    .catch((error: unknown) => {
-      console.error('Nest bootstrap failed', error);
-    });
-
-  expressApp.use((req: Request, res: Response, next: NextFunction) => {
-    appPromise
-      .then(async (app) => {
-        await app.init();
-        next();
-      })
-      .catch((error: unknown) => {
-        console.error(error);
-        if (!res.headersSent) {
-          res.status(500).json({
-            message: 'API bootstrap failed',
-            detail: error instanceof Error ? error.message : String(error),
-          });
-        }
-      });
+  const appPromise = (
+    process.env.VERCEL
+      ? NestFactory.create(AppModule)
+      : NestFactory.create(AppModule, {
+          instrument: ObserveInstrument,
+        })
+  ).then(async (app) => {
+    configureApp(app);
+    return app;
   });
 
-  return { appPromise, expressApp };
+  return { appPromise };
 }
