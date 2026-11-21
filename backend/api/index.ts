@@ -1,4 +1,4 @@
 import 'reflect-metadata'
-import { createAppFactory } from '../dist/bootstrap.js'
+import { createAppFactory } from '../src/bootstrap.js'
 
 export default createAppFactory().expressApp
