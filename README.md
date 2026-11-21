@@ -9,10 +9,19 @@
 | API `interview-haupcar` | `backend` | https://interview-haupcar.vercel.app |
 | Web `interview-haupcar-93hn` | `frontend` | https://interview-haupcar-93hn.vercel.app |
 
-### API project env (Secret/Config ตามความเหมาะสม)
+### API project settings
 
-- `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`
-- `CORS_ORIGINS=https://interview-haupcar-93hn.vercel.app` (หรือปล่อยให้โค้ดรับ `*.vercel.app`)
+- Root Directory = `backend`
+- Framework Preset = **NestJS**
+- Env (จำเป็น ไม่มีแล้วจะ 500):
+
+| Key | หมายเหตุ |
+| --- | --- |
+| `DATABASE_URL` | Postgres (เช่น Supabase pooler) |
+| `DIRECT_URL` | Postgres session URL สำหรับ migrate |
+| `JWT_SECRET` | อย่างน้อย 32 ตัวอักษร |
+
+Optional: `CORS_ORIGINS=https://interview-haupcar-93hn.vercel.app`
 
 ### Web project env (**Config**)
 
