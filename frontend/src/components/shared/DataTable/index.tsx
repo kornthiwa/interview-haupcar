@@ -7,10 +7,10 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import { Typography } from '@/components/ui/Typography/index.tsx'
 
-type Column<T> = {
+export type Column<T> = {
   key: keyof T & string
   header: string
-  render?: (row: T) => string
+  render?: (row: T, index: number) => string
 }
 
 type DataTableProps<T extends object> = {
@@ -44,12 +44,12 @@ export function DataTable<T extends object>({
               </TableCell>
             </TableRow>
           ) : (
-            rows.map((row) => (
+            rows.map((row, index) => (
               <TableRow key={getRowId(row)} hover>
                 {columns.map((column) => (
                   <TableCell key={column.key}>
                     {column.render
-                      ? column.render(row)
+                      ? column.render(row, index)
                       : String(row[column.key])}
                   </TableCell>
                 ))}

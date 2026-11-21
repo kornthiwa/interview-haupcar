@@ -6,7 +6,7 @@ import { useUser } from '@/hooks/index.ts'
 import { useAuth } from '@/features/auth/hooks/index.ts'
 
 const links = [
-  { to: paths.home, label: 'Home', end: true },
+  { to: paths.car, label: 'Car', end: true },
   { to: paths.settings, label: 'Settings', end: false },
   { to: paths.profile, label: 'Profile', end: false },
 ]

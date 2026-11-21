@@ -24,7 +24,7 @@ export function Login() {
   async function onSubmit(values: LoginInput) {
     try {
       await login(values)
-      navigate(paths.home, { replace: true })
+      navigate(paths.car, { replace: true })
     } catch {
       // loginError is rendered from the mutation
     }
@@ -33,7 +33,7 @@ export function Login() {
   async function onAdminLogin() {
     try {
       await login({ username: 'admin', password: 'admin' })
-      navigate(paths.home, { replace: true })
+      navigate(paths.car, { replace: true })
     } catch {
       // loginError is rendered from the mutation
     }

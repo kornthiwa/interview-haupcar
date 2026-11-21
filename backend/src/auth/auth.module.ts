@@ -14,7 +14,7 @@ import { JwtAuth } from './jwt-auth.js';
           key: config.getOrThrow<string>('JWT_SECRET'),
           issuer: 'interview-haupcar',
           audience: 'web',
-          ttl: '15m',
+          ttl: '1d',
         },
         refreshToken: false,
         allowInMemoryStorage: true,

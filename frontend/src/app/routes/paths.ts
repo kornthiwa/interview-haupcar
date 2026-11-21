@@ -1,5 +1,5 @@
 export const paths = {
-  home: '/',
+  car: '/',
   profile: '/profile',
   settings: '/settings',
   login: '/login',

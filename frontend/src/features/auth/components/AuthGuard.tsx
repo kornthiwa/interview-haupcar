@@ -10,6 +10,6 @@ export function AuthGuard() {
 
 export function GuestGuard() {
   const accessToken = useAuthStore((state) => state.accessToken)
-  if (accessToken) return <Navigate to={paths.home} replace />
+  if (accessToken) return <Navigate to={paths.car} replace />
   return <Outlet />
 }
