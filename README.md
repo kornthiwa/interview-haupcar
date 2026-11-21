@@ -2,6 +2,22 @@
 
 ระบบเช่ารถ: React frontend + NestJS API + PostgreSQL
 
+## Deploy frontend บน Vercel
+
+โปรเจกต์เป็น monorepo — ใน Vercel Project Settings ตั้ง:
+
+| Setting | ค่า |
+| --- | --- |
+| Root Directory | `frontend` (แนะนำ) หรือใช้ `vercel.json` ที่ root |
+| Framework | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Environment | `API_URL` = URL backend จริง เช่น `https://your-api.example.com/api` (ชนิด **Config**) |
+
+Backend NestJS + Postgres ต้องรันที่อื่น (เช่น Docker/Railway) — Vercel โฮสต์แค่ frontend
+
+---
+
 ## ตรวจงานด้วย Docker (แนะนำ)
 
 ต้องมี [Docker Desktop](https://www.docker.com/products/docker-desktop/) ติดตั้งไว้
