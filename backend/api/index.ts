@@ -1,19 +1,35 @@
-import 'reflect-metadata'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import express, { type Express } from 'express'
-import { NestFactory } from '@nestjs/core'
-import { ExpressAdapter } from '@nestjs/platform-express'
-import { AppModule } from '../src/app.module.js'
-import { configureApp } from '../src/bootstrap.js'
 
-let boot: Promise<Express> | undefined
+type ExpressApp = {
+  (req: IncomingMessage, res: ServerResponse): void
+}
 
-async function createServer(): Promise<Express> {
+let boot: Promise<ExpressApp> | undefined
+
+async function createServer(): Promise<ExpressApp> {
+  await import('reflect-metadata')
+  const express = (await import('express')).default
+  const { NestFactory } = await import('@nestjs/core')
+  const { ExpressAdapter } = await import('@nestjs/platform-express')
+  const { AppModule } = await import('../src/app.module.js')
+  const { configureApp } = await import('../src/bootstrap.js')
+
   const server = express()
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server))
   configureApp(app)
   await app.init()
   return server
+}
+
+function sendJson(
+  res: ServerResponse,
+  status: number,
+  body: Record<string, unknown>,
+) {
+  if (res.headersSent) return
+  res.statusCode = status
+  res.setHeader('content-type', 'application/json; charset=utf-8')
+  res.end(JSON.stringify(body))
 }
 
 export default async function handler(
@@ -26,15 +42,10 @@ export default async function handler(
     server(req, res)
   } catch (error) {
     console.error('API bootstrap failed', error)
-    if (res.headersSent) return
-    res.statusCode = 500
-    res.setHeader('content-type', 'application/json; charset=utf-8')
-    res.end(
-      JSON.stringify({
-        message: 'API bootstrap failed',
-        detail: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      }),
-    )
+    sendJson(res, 500, {
+      message: 'API bootstrap failed',
+      detail: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
   }
 }
