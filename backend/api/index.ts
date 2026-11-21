@@ -12,7 +12,7 @@ async function createServer(): Promise<ExpressApp> {
   const { NestFactory } = await import('@nestjs/core')
   const { ExpressAdapter } = await import('@nestjs/platform-express')
   const { AppModule } = await import('../src/app.module.js')
-  const { configureApp } = await import('../src/bootstrap.js')
+  const { configureApp } = await import('../src/app.setup.js')
 
   const server = express()
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server))
