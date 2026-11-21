@@ -1,11 +1,13 @@
 import { Input } from '@/components/ui/Input/index.tsx'
 import { Stack } from '@/components/ui/Stack/index.tsx'
-import { useUser } from '@/hooks/index.ts'
 import { formatDateTime } from '@/utils/index.ts'
+import type { User } from '../types/index.ts'
 
-export function UserForm() {
-  const user = useUser()
+type UserFormProps = {
+  user: User | null
+}
 
+export function UserForm({ user }: UserFormProps) {
   return (
     <Stack spacing={2}>
       <Input label="Name" value={user?.name ?? ''} readOnly />

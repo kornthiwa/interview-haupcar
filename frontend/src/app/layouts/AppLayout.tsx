@@ -1,21 +1,20 @@
 import { AppBar, Box, Toolbar } from '@mui/material'
 import { NavLink, Outlet, useNavigate } from 'react-router'
 import { paths } from '@/app/routes/paths.ts'
-import { Button } from '@/components/ui/Button/index.tsx'
 import { Typography } from '@/components/ui/Typography/index.tsx'
 import { useUser } from '@/hooks/index.ts'
 import { useAuth } from '@/features/auth/hooks/index.ts'
 
 const links = [
   { to: paths.home, label: 'Home', end: true },
-  { to: paths.user, label: 'User', end: false },
   { to: paths.settings, label: 'Settings', end: false },
+  { to: paths.profile, label: 'Profile', end: false },
 ]
 
 export function AppLayout() {
   const navigate = useNavigate()
   const user = useUser()
-  const { logout, isLoggingOut } = useAuth()
+  const { logout } = useAuth()
 
   async function handleLogout() {
     try {

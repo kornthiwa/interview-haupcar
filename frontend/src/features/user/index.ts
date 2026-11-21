@@ -1,1 +1,5 @@
 export { UserPage } from './components/UserPage.tsx'
+export { UserForm } from './components/UserForm.tsx'
+export { useUserProfile, userQueryKey } from './hooks/index.ts'
+export { getUserById } from './services/index.ts'
+export type { User } from './types/index.ts'

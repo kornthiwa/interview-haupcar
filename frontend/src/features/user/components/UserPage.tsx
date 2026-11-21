@@ -1,11 +1,12 @@
-import { Box, Paper } from '@mui/material'
+import { Box, CircularProgress, Paper } from '@mui/material'
+import { Alert } from '@/components/ui/Alert/index.tsx'
 import { Stack } from '@/components/ui/Stack/index.tsx'
 import { Typography } from '@/components/ui/Typography/index.tsx'
-import { useUser } from '@/hooks/index.ts'
+import { useUserProfile } from '../hooks/index.ts'
 import { UserForm } from './UserForm.tsx'
 
 export function UserPage() {
-  const user = useUser()
+  const { user, isLoading, isError } = useUserProfile()
 
   return (
     <Box
@@ -33,7 +34,13 @@ export function UserPage() {
               {user ? `Signed in as ${user.username}` : 'Your account details'}
             </Typography>
           </Stack>
-          <UserForm />
+          {isLoading ? (
+            <Box sx={{ display: 'grid', placeItems: 'center', py: 4 }}>
+              <CircularProgress size={28} />
+            </Box>
+          ) : null}
+          {isError ? <Alert severity="error">Failed to load profile</Alert> : null}
+          {!isLoading && !isError ? <UserForm user={user} /> : null}
         </Stack>
       </Paper>
     </Box>

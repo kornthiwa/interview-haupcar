@@ -1,3 +1,1 @@
-export type HomeSummary = {
-  title: string
-}
+export type { HomeSummary } from './home.ts'

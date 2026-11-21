@@ -1,3 +1,1 @@
-export function useHome() {
-  return { title: 'Home' }
-}
+export { useHome } from './useHome.ts'
