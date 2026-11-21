@@ -24,6 +24,12 @@ export class LoginDto {
   password: string;
 }
 
+export class LogoutDto {
+  @IsString()
+  @IsNotEmpty()
+  accessToken: string;
+}
+
 export class UpdateUserDto {
   @IsOptional()
   @IsString()

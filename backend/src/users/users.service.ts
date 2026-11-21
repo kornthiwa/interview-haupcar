@@ -130,6 +130,14 @@ export class UsersService {
     }
   }
 
+  async logout(accessToken: string) {
+    try {
+      await this.tokens.revoke(accessToken);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
   async update(id: string, dto: UpdateUserDto): Promise<UserRecord> {
     try {
       return await this.prisma.user.update({
