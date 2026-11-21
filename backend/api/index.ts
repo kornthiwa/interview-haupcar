@@ -21,17 +21,6 @@ async function createServer(): Promise<ExpressApp> {
   return server
 }
 
-function sendJson(
-  res: ServerResponse,
-  status: number,
-  body: Record<string, unknown>,
-) {
-  if (res.headersSent) return
-  res.statusCode = status
-  res.setHeader('content-type', 'application/json; charset=utf-8')
-  res.end(JSON.stringify(body))
-}
-
 export default async function handler(
   req: IncomingMessage,
   res: ServerResponse,
@@ -42,10 +31,14 @@ export default async function handler(
     server(req, res)
   } catch (error) {
     console.error('API bootstrap failed', error)
-    sendJson(res, 500, {
-      message: 'API bootstrap failed',
-      detail: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    })
+    if (res.headersSent) return
+    res.statusCode = 500
+    res.setHeader('content-type', 'application/json; charset=utf-8')
+    res.end(
+      JSON.stringify({
+        message: 'API bootstrap failed',
+        detail: error instanceof Error ? error.message : String(error),
+      }),
+    )
   }
 }

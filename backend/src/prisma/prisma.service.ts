@@ -11,20 +11,15 @@ export class PrismaService
 
   async onModuleInit() {
     const url = process.env.DATABASE_URL ?? '';
-    if (!url || url.includes('[YOUR-PASSWORD]')) {
+    if (url.includes('[YOUR-PASSWORD]')) {
       this.logger.warn(
-        'DATABASE_URL is missing or still a placeholder. Prisma is set up but not connected.',
+        'DATABASE_URL still contains [YOUR-PASSWORD]. Prisma is set up but not connected.',
       );
       return;
     }
 
-    try {
-      await this.$connect();
-      this.connected = true;
-    } catch (error) {
-      this.logger.error('Prisma failed to connect', error);
-      throw error;
-    }
+    await this.$connect();
+    this.connected = true;
   }
 
   async onModuleDestroy() {

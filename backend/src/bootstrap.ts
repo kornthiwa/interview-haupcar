@@ -1,7 +1,6 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule, ObserveInstrument } from './app.module.js';
 
+/** Shared Nest setup for local/Docker (`main.ts`) and Vercel (`api/index.ts`). */
 export function configureApp(app: INestApplication) {
   app.setGlobalPrefix('api');
 
@@ -16,22 +15,4 @@ export function configureApp(app: INestApplication) {
       transform: true,
     }),
   );
-}
-
-/** Nest listen for local / Docker / official Vercel Nest runtime. */
-export function createAppFactory(): {
-  appPromise: Promise<INestApplication>;
-} {
-  const appPromise = (
-    process.env.VERCEL
-      ? NestFactory.create(AppModule)
-      : NestFactory.create(AppModule, {
-          instrument: ObserveInstrument,
-        })
-  ).then(async (app) => {
-    configureApp(app);
-    return app;
-  });
-
-  return { appPromise };
 }

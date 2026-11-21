@@ -1,10 +1,17 @@
 import 'reflect-metadata';
-import { createAppFactory } from './bootstrap.js';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { AppModule, ObserveInstrument } from './app.module.js';
+import { configureApp } from './bootstrap.js';
 
 async function bootstrap() {
-  const { appPromise } = createAppFactory();
-  const app = await appPromise;
-  await app.listen(process.env.PORT ?? 3000);
+  const app = await NestFactory.create(AppModule, {
+    instrument: ObserveInstrument,
+  });
+  configureApp(app);
+
+  const config = app.get(ConfigService);
+  await app.listen(config.get<string>('PORT') ?? 3000);
 }
 
-void bootstrap();
+await bootstrap();
