@@ -21,11 +21,3 @@ export {
   getCarModels,
   updateCarModel,
 } from './car-models.ts'
-
-export {
-  createCar,
-  deleteCar,
-  getCar,
-  getCars,
-  updateCar,
-} from './cars.ts'
