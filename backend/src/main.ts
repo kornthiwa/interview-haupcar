@@ -17,8 +17,21 @@ async function bootstrap() {
       'http://127.0.0.1:5173',
       'http://localhost:8080',
       'http://127.0.0.1:8080',
+      'https://interview-haupcar.vercel.app',
     ];
-  app.enableCors({ origin: corsOrigins });
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        corsOrigins.includes(origin) ||
+        /\.vercel\.app$/i.test(origin)
+      ) {
+        callback(null, true);
+        return;
+      }
+      callback(null, false);
+    },
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -26,6 +39,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(config.get<string>('PORT') ?? 3000);
+  const port = config.get<string>('PORT') ?? 3000;
+  await app.listen(port, '0.0.0.0');
 }
 await bootstrap();

@@ -4,17 +4,21 @@
 
 ## Deploy frontend บน Vercel
 
-โปรเจกต์เป็น monorepo — ใน Vercel Project Settings ตั้ง:
+Vercel โฮสต์ **frontend อย่างเดียว** — Nest API ต้องมี URL สาธารณะแยก (Docker / Railway / Render)
+
+ใน Vercel → Project Settings:
 
 | Setting | ค่า |
 | --- | --- |
-| Root Directory | `frontend` (แนะนำ) หรือใช้ `vercel.json` ที่ root |
-| Framework | Vite |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Environment | `API_URL` = URL backend จริง เช่น `https://your-api.example.com/api` (ชนิด **Config**) |
+| Root Directory | ว่าง (ใช้ `vercel.json` ที่ root) **หรือ** `frontend` |
+| Framework Preset | Other / Vite |
+| Environment | `API_URL` = `https://<backend-host>/api` ชนิด **Config** (ห้ามเป็น Secret) |
 
-Backend NestJS + Postgres ต้องรันที่อื่น (เช่น Docker/Railway) — Vercel โฮสต์แค่ frontend
+ตัวอย่าง: ถ้า API อยู่ที่ `https://haupcar-api.onrender.com` ให้ตั้ง `API_URL=https://haupcar-api.onrender.com/api` แล้ว Redeploy
+
+ถ้าไม่ตั้ง `API_URL` แอปจะเรียก `/api` บนโดเมน Vercel → ไม่มี Nest → login/CRUD พัง
+
+ตรวจงานครบระบบแนะนำ `docker compose up --build` แทน Vercel
 
 ---
 
