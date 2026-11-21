@@ -1,6 +1,14 @@
+import { PasswordHasher } from '@nestjs/authentication';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const passwords = new PasswordHasher({ logN: 10 });
+
+const DEMO_USER = {
+  name: 'Interview Admin',
+  username: 'admin',
+  password: 'admin123',
+};
 
 const fleet = [
   { brand: 'Toyota', model: 'Camry', type: 'เก๋ง', price: 1990, count: 5 },
@@ -139,6 +147,20 @@ async function main() {
 
   await prisma.car.createMany({ data: buildCars(modelIds) });
 
+  const demoPassword = await passwords.hash(DEMO_USER.password);
+  await prisma.user.upsert({
+    where: { username: DEMO_USER.username },
+    update: {
+      name: DEMO_USER.name,
+      password: demoPassword,
+    },
+    create: {
+      name: DEMO_USER.name,
+      username: DEMO_USER.username,
+      password: demoPassword,
+    },
+  });
+
   const [cars, byStatus] = await Promise.all([
     prisma.car.count(),
     prisma.car.groupBy({ by: ['status'], _count: true }),
@@ -146,6 +168,10 @@ async function main() {
   console.log(
     JSON.stringify(
       {
+        demoUser: {
+          username: DEMO_USER.username,
+          password: DEMO_USER.password,
+        },
         carTypes: types.length,
         brands: brands.length,
         models: models.length,

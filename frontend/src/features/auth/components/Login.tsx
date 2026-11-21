@@ -32,7 +32,7 @@ export function Login() {
 
   async function onAdminLogin() {
     try {
-      await login({ username: 'admin', password: 'admin' })
+      await login({ username: 'admin', password: 'admin123' })
       navigate(paths.car, { replace: true })
     } catch {
       // loginError is rendered from the mutation
