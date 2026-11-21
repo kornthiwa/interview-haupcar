@@ -57,9 +57,12 @@ export function createAppFactory(): {
 } {
   const expressApp = express();
   const adapter = new ExpressAdapter(expressApp);
-  const appPromise = NestFactory.create(AppModule, adapter, {
-    instrument: ObserveInstrument,
-  });
+  // Observe instrumentation is unreliable in Vercel serverless cold starts
+  const appPromise = process.env.VERCEL
+    ? NestFactory.create(AppModule, adapter)
+    : NestFactory.create(AppModule, adapter, {
+        instrument: ObserveInstrument,
+      });
 
   appPromise
     .then(async (app) => {
