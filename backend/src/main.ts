@@ -1,11 +1,10 @@
-import { createExpressApp } from './bootstrap.js';
+import { createAppFactory } from './bootstrap.js';
 
 async function bootstrap() {
-  const expressApp = await createExpressApp();
+  const { appPromise } = createAppFactory();
+  const app = await appPromise;
   const port = Number(process.env.PORT ?? 3000);
-  await new Promise<void>((resolve) => {
-    expressApp.listen(port, '0.0.0.0', () => resolve());
-  });
+  await app.listen(port, '0.0.0.0');
 }
 
 await bootstrap();
