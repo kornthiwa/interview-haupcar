@@ -7,6 +7,10 @@ import { AuthModule } from './auth/auth.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { SupabaseModule } from './supabase/supabase.module.js';
 import { UsersModule } from './users/users.module.js';
+import { BrandsModule } from './brands/brands.module.js';
+import { CarTypesModule } from './car-types/car-types.module.js';
+import { CarModelsModule } from './car-models/car-models.module.js';
+import { CarsModule } from './cars/cars.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -22,6 +26,10 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     PrismaModule,
     UsersModule,
     SupabaseModule,
+    BrandsModule,
+    CarTypesModule,
+    CarModelsModule,
+    CarsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

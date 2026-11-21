@@ -10,7 +10,10 @@ import {
   Post,
 } from '@nestjs/common';
 import { Public } from '@nestjs/authentication';
-import { CreateUserDto, LoginDto, LogoutDto, UpdateUserDto } from './dto/user.dto.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { LogoutDto } from './dto/logout.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UsersService } from './users.service.js';
 
 @Controller('users')

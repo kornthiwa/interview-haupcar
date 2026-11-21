@@ -4,12 +4,12 @@ import {
   JwtBearerProvider,
   type JwtClaims,
 } from '@nestjs/authentication';
-import type { UserRecord } from '../users/users.service.js';
+import type { PublicUser } from '../users/entities/user.entity.js';
 import { UsersService } from '../users/users.service.js';
 import './authentication.types.js';
 
 @Injectable()
-export class JwtAuth extends JwtBearerProvider<UserRecord> {
+export class JwtAuth extends JwtBearerProvider<PublicUser> {
   constructor(
     private readonly users: UsersService,
     registry: AuthenticationRegistry,

@@ -1,8 +1,8 @@
-import type { UserRecord } from '../users/users.service.js';
+import type { PublicUser } from '../users/entities/user.entity.js';
 
 declare module '@nestjs/authentication' {
   interface AuthenticationTypes {
-    user: UserRecord;
+    user: PublicUser;
     refreshTokens: false;
   }
 }

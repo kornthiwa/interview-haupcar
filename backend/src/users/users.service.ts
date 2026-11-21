@@ -9,50 +9,10 @@ import { scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreateUserDto, LoginDto, UpdateUserDto } from './dto/user.dto.js';
-
-const scryptAsync = promisify(scrypt);
-
-const userSelect = {
-  id: true,
-  name: true,
-  username: true,
-  createdAt: true,
-  updatedAt: true,
-} as const;
-
-export type UserRecord = {
-  id: string;
-  name: string;
-  username: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-async function verifyLegacyPassword(password: string, stored: string) {
-  const [salt, storedHash] = stored.split(':');
-  if (!salt || !storedHash) return false;
-
-  const hash = (await scryptAsync(password, salt, 64)) as Buffer;
-  const storedBuffer = Buffer.from(storedHash, 'hex');
-  if (storedBuffer.length !== hash.length) return false;
-  return timingSafeEqual(hash, storedBuffer);
-}
-
-function isPrismaError(
-  error: unknown,
-  code: string,
-): error is PrismaClientKnownRequestError {
-  return error instanceof PrismaClientKnownRequestError && error.code === code;
-}
-
-function isUniqueConflict(error: unknown) {
-  return isPrismaError(error, 'P2002');
-}
-
-function isMissing(error: unknown) {
-  return isPrismaError(error, 'P2025');
-}
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import type { PublicUser, User } from './entities/user.entity.js';
 
 @Injectable()
 export class UsersService {
@@ -62,31 +22,38 @@ export class UsersService {
     private readonly tokens: TokenService,
   ) {}
 
-  findAll() {
-    return this.prisma.user.findMany({
-      select: userSelect,
+  async findAll(): Promise<PublicUser[]> {
+    const users = await this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
     });
+    return users.map(({ password: _, ...user }) => user);
   }
 
-  async findOne(id: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      select: userSelect,
-    });
+  async findOne(id: string): Promise<PublicUser> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+    const { password: _, ...result } = user;
+    return result;
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
+    const user: User | null = await this.prisma.user.findUnique({
       where: { username: dto.username },
     });
     const current = await this.passwords.verify(dto.password, user?.password);
-    const legacy =
-      !current && user
-        ? await verifyLegacyPassword(dto.password, user.password)
-        : false;
+
+    let legacy = false;
+    if (!current && user) {
+      const [salt, storedHash] = user.password.split(':');
+      if (salt && storedHash) {
+        const hash = (await promisify(scrypt)(dto.password, salt, 64)) as Buffer;
+        const storedBuffer = Buffer.from(storedHash, 'hex');
+        legacy =
+          storedBuffer.length === hash.length &&
+          timingSafeEqual(hash, storedBuffer);
+      }
+    }
+
     if (!user || (!current && !legacy)) {
       throw new UnauthorizedException('Invalid username or password');
     }
@@ -101,29 +68,30 @@ export class UsersService {
     const tokens = await this.tokens.issue(user.id, {
       claims: { name: user.name },
     });
+    const { password: _, ...result } = user;
     return {
-      id: user.id,
-      name: user.name,
-      username: user.username,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      ...result,
       accessToken: tokens.accessToken,
       expiresIn: tokens.expiresIn,
     };
   }
 
-  async create(dto: CreateUserDto): Promise<UserRecord> {
+  async create(dto: CreateUserDto): Promise<PublicUser> {
     try {
-      return await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: {
           name: dto.name,
           username: dto.username,
           password: await this.passwords.hash(dto.password),
         },
-        select: userSelect,
       });
+      const { password: _, ...result } = user;
+      return result;
     } catch (error) {
-      if (isUniqueConflict(error)) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Username already exists');
       }
       throw error;
@@ -133,14 +101,14 @@ export class UsersService {
   async logout(accessToken: string) {
     try {
       await this.tokens.revoke(accessToken);
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }
 
-  async update(id: string, dto: UpdateUserDto): Promise<UserRecord> {
+  async update(id: string, dto: UpdateUserDto): Promise<PublicUser> {
     try {
-      return await this.prisma.user.update({
+      const user = await this.prisma.user.update({
         where: { id },
         data: {
           name: dto.name,
@@ -149,11 +117,20 @@ export class UsersService {
             ? await this.passwords.hash(dto.password)
             : undefined,
         },
-        select: userSelect,
       });
+      const { password: _, ...result } = user;
+      return result;
     } catch (error) {
-      if (isMissing(error)) throw new NotFoundException('User not found');
-      if (isUniqueConflict(error)) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('User not found');
+      }
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Username already exists');
       }
       throw error;
@@ -164,7 +141,12 @@ export class UsersService {
     try {
       await this.prisma.user.delete({ where: { id } });
     } catch (error) {
-      if (isMissing(error)) throw new NotFoundException('User not found');
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('User not found');
+      }
       throw error;
     }
   }

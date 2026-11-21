@@ -30,6 +30,14 @@ export function Login() {
     }
   }
 
+  async function onAdminLogin() {
+    try {
+      await login({ username: 'admin', password: 'admin' })
+      navigate(paths.home, { replace: true })
+    } catch {
+      // loginError is rendered from the mutation
+    }
+  }
   return (
     <AuthCard title="Login" subtitle="Sign in to Haupcar">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -72,6 +80,14 @@ export function Login() {
             </Typography>
             <Button variant="text" type="button" onClick={() => navigate(paths.register)}>
               Register
+            </Button>
+          </Stack>
+          <Stack direction="row" sx={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              Continue as admin?
+            </Typography>
+            <Button variant="text" type="button" disabled={isLoggingIn} onClick={onAdminLogin}>
+              Login as admin
             </Button>
           </Stack>
         </Stack>

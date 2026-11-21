@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/hooks/index.ts'
 const links = [
   { to: paths.home, label: 'Home', end: true },
   { to: paths.user, label: 'User', end: false },
+  { to: paths.settings, label: 'Settings', end: false },
 ]
 
 export function AppLayout() {
@@ -33,9 +34,15 @@ export function AppLayout() {
         sx={{ borderBottom: 1, borderColor: 'divider' }}
       >
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2 }}>
             Haupcar
+
+              <Typography variant="body2" sx={{ alignSelf: 'center' }}>
+                {user?.name}
+              </Typography>
+  
           </Typography>
+         
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {links.map((link) => (
               <NavLink
@@ -54,19 +61,21 @@ export function AppLayout() {
                 {link.label}
               </NavLink>
             ))}
-            {user ? (
-              <Typography variant="body2" sx={{ alignSelf: 'center' }}>
-                {user.username}
-              </Typography>
-            ) : null}
-            <Button
-              variant="text"
-              color="inherit"
-              disabled={isLoggingOut}
+           
+            <NavLink
+              to={paths.login}
+              style={({ isActive }) => ({
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'inherit',
+                fontWeight: isActive ? 700 : 500,
+                textDecoration: 'none',
+              })}
               onClick={handleLogout}
             >
               Logout
-            </Button>
+            </NavLink>
           </Box>
         </Toolbar>
       </AppBar>
