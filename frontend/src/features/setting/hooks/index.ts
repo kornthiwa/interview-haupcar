@@ -6,3 +6,4 @@ export {
   useCarModels,
   useCarTypes,
 } from './useSetting.ts'
+export { useSettingMutations } from './useSettingMutations.ts'

@@ -12,13 +12,12 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString()
 }
 
-function buildColumns(page: number): Column<Car>[] {
-  const offset = (page - 1) * PAGE_SIZE
+function buildColumns(): Column<Car>[] {
   return [
     {
       key: 'id',
-      header: '#',
-      render: (_row, index) => String(offset + index + 1),
+      header: 'id',
+      render: (row) => String(row.id),
     },
     { key: 'licensePlate', header: 'License Plate' },
     { key: 'color', header: 'Color' },
@@ -50,7 +49,7 @@ export function CarTable() {
     const start = (page - 1) * PAGE_SIZE
     return cars.slice(start, start + PAGE_SIZE)
   }, [cars, page])
-  const columns = useMemo(() => buildColumns(page), [page])
+  const columns = useMemo(() => buildColumns(), [])
 
   if (isLoading) {
     return (

@@ -6,6 +6,7 @@ export {
   useBrands,
   useCarModels,
   useCarTypes,
+  useSettingMutations,
 } from './hooks/index.ts'
 export {
   createBrand,

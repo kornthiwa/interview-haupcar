@@ -5,12 +5,13 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import type { ReactNode } from 'react'
 import { Typography } from '@/components/ui/Typography/index.tsx'
 
 export type Column<T> = {
-  key: keyof T & string
+  key: string
   header: string
-  render?: (row: T, index: number) => string
+  render?: (row: T, index: number) => ReactNode
 }
 
 type DataTableProps<T extends object> = {
@@ -50,7 +51,7 @@ export function DataTable<T extends object>({
                   <TableCell key={column.key}>
                     {column.render
                       ? column.render(row, index)
-                      : String(row[column.key])}
+                      : String(row[column.key as keyof T] ?? '')}
                   </TableCell>
                 ))}
               </TableRow>
