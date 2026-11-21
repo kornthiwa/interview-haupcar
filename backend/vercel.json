@@ -1,4 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npx prisma generate && nest build"
+  "buildCommand": "npx prisma generate && nest build",
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "{prisma/**,node_modules/.prisma/**,node_modules/@prisma/client/**}",
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }
